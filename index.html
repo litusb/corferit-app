@@ -14,6 +14,55 @@
 </style>
 </head>
 <body>
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyCLRBsJDKcv9I0hf3uosB0F3w7rXWU-40A",
+    authDomain: "corferit-daus.firebaseapp.com",
+    projectId: "corferit-daus",
+    storageBucket: "corferit-daus.firebasestorage.app",
+    messagingSenderId: "756634249064",
+    appId: "1:756634249064:web:8e09d8bf75aebcb1b118dd"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+</script>
+<script type="module">
+// import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+// const firebaseConfig = {
+//   apiKey: "TU_API_KEY",
+//   projectId: "TU_PROJECT_ID"
+// };
+
+// const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const rollsRef = collection(db, "rooms/sala-1/rolls");
+
+async function sendRoll(player, result) {
+  await addDoc(rollsRef, {
+    player,
+    result,
+    time: Date.now()
+  });
+}
+
+onSnapshot(rollsRef, snapshot => {
+  snapshot.docChanges().forEach(change => {
+    if (change.type === "added") {
+      console.log(change.doc.data());
+    }
+  });
+});
+</script>
 
 <h1>🎲 Corferit</h1>
 
@@ -41,6 +90,7 @@
     const d6 = rollD6();
 
     let winner = "";
+    let final = 0;
     let colorClass = "";
 
     if (esperança >= por) {
@@ -51,32 +101,40 @@
       colorClass = "por";
     }
 
-    let final = esperança + por;
-    let extra = "";
-
-    if (v === 1) {
-      final += d6;
-      extra = ` | +⚅ ${d6}`;
-    } else if (v === 0) {
-      final -= d6;
-      extra = ` | -⚅ ${d6}`;
-    }
+    final = esperança + por;
 
     const text = `
       <div>
-        ⬡ ${esperança} | ⬢ ${por}${extra}<br>
+        ⬡ ${esperança} | ⬢ ${por}<br>
         <strong>${final}</strong> amb <span class="${colorClass}">${winner}</span>.
       </div>
     `;
 
+    if (v == 1) {
+      final += d6;
+          const text = `
+            <div>
+              ⬡ ${esperança} | ⬢ ${por} | +⚅ ${d6} <br>
+              <strong>${final}</strong> amb <span class="${colorClass}">${winner}</span>.
+            </div>
+          `;
+    } else if (v == 0) {
+      final -= d6;
+          const text = `
+            <div>
+              ⬡ ${esperança} | ⬢ ${por} | -⚅ ${d6} <br>
+              <strong>${final}</strong> amb <span class="${colorClass}">${winner}</span>.
+            </div>
+          `;
+    }
+
     document.getElementById("result").innerHTML = text;
 
     history.unshift(text);
-    if (history.length > 20) history.pop();
+    if (history.length > 20) history.pop(); // limita el histórico
     document.getElementById("history").innerHTML = history.join("<hr>");
   }
 </script>
-
 
 </body>
 </html>
