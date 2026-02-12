@@ -4,7 +4,7 @@
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-      <title>Corferit</title>
+      <title>Corferit - Tirades</title>
 
       <style>
          body {
@@ -517,6 +517,7 @@
             getDocs,
             deleteDoc,
             setDoc,
+            serverTimestamp,
          } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
          import {
             getAuth,
@@ -538,6 +539,9 @@
          const app = initializeApp(firebaseConfig);
          const db = getFirestore(app);
          const auth = getAuth(app);
+
+         let currentRoomName = null;
+         let currentRollsRef = null;
 
          async function cleanOldRooms() {
             const roomsSnapshot = await getDocs(collection(db, "rooms")); // 🔹 getDocs para colecciones
@@ -569,12 +573,12 @@
             return params.get("room") || "sala-general";
          }
 
-         const roomName = getRoomFromURL();
-         document.getElementById("roomLabel").innerText = "Sala: " + roomName;
-
-         const rollsRef = collection(db, "rooms", roomName, "rolls");
-
-         const q = query(rollsRef, orderBy("time", "desc"), limit(50));
+         // const roomName = getRoomFromURL();
+         // document.getElementById("roomLabel").innerText = "Sala: " + roomName;
+         //
+         // const rollsRef = collection(db, "rooms", roomName, "rolls");
+         //
+         // const q = query(rollsRef, orderBy("time", "desc"), limit(50));
 
          // 🔐 LOGIN
          window.login = async function () {
@@ -605,19 +609,53 @@
 
          // 🔐 Estado de autenticación
          onAuthStateChanged(auth, async (user) => {
-            if (user) {
-               document.getElementById("loginBox").style.display = "none";
-               document.getElementById("app").style.display = "block";
-               const isMaster = await checkMaster(user); // leemos si es máster
-               startApp(isMaster);
-            } else {
+            if (!user) {
                document.getElementById("loginBox").style.display = "block";
                document.getElementById("app").style.display = "none";
+               return;
             }
+
+            document.getElementById("loginBox").style.display = "none";
+            document.getElementById("app").style.display = "block";
+
+            const roomName = getRoomFromURL();
+            document.getElementById("roomLabel").innerText =
+               "Sala: " + roomName;
+
+            const roomRef = doc(db, "rooms", roomName);
+            const roomSnap = await getDoc(roomRef);
+
+            if (!roomSnap.exists()) {
+               try {
+                  await setDoc(roomRef, {
+                     name: roomName,
+                     createdAt: serverTimestamp(),
+                  });
+               } catch (e) {
+                  console.warn("No tienes permisos para crear esta sala");
+                  return;
+               }
+            }
+
+            // 🔥 SOLO AHORA creamos las referencias
+            const rollsRef = collection(db, "rooms", roomName, "rolls");
+            const q = query(rollsRef, orderBy("time", "desc"), limit(50));
+
+            currentRoomName = roomName;
+            currentRollsRef = collection(db, "rooms", roomName, "rolls");
+
+            const isMaster = await checkMaster(user);
+
+            startApp({
+               isMaster,
+               roomName,
+               rollsRef,
+               q,
+            });
          });
 
          // 🔹 Firestore en tiempo real
-         function startApp(isMaster) {
+         function startApp({ isMaster, roomName, rollsRef, q }) {
             onSnapshot(q, (snapshot) => {
                const historyDiv = document.getElementById("history");
                historyDiv.innerHTML = "";
@@ -775,6 +813,12 @@
                document.getElementById("playerName").value ||
                auth.currentUser.email;
 
+            const timestamp = new Date().toLocaleTimeString([], {
+               hour: "2-digit",
+               minute: "2-digit",
+               second: "2-digit",
+            });
+
             let criticalHTML = "";
             if (isCritical) {
                criticalHTML = `<span class="critical">🎯 CRÍTIC! 🎯</span>`;
@@ -802,7 +846,15 @@
 
             document.getElementById("result").innerHTML = text;
 
-            await addDoc(rollsRef, { text: text, time: Date.now() });
+            if (!currentRollsRef) {
+               console.warn("La sala no está inicializada aún");
+               return;
+            }
+
+            await addDoc(currentRollsRef, {
+               text: timestamp + text,
+               time: Date.now(),
+            });
          };
          const diceTypes = [3, 4, 6, 8, 10, 12, 20, 100];
 
@@ -880,11 +932,18 @@
             const player =
                document.getElementById("playerName").value ||
                auth.currentUser.email;
+
+            const timestamp = new Date().toLocaleTimeString([], {
+               hour: "2-digit",
+               minute: "2-digit",
+               second: "2-digit",
+            });
+
             if (fixedModifier != 0) {
                fixedModifierHTML = `<span class="dice-icon modificador-fixe roll-animate">${fixedModifier >= 0 ? "+" : ""}${fixedModifier}</span>`;
             }
             const text = `
-              <strong>${player}</strong><br>
+              ${timestamp} » <strong>${player}</strong><br>
               ${resultsHTML}
               ${fixedModifierHTML}
 
@@ -893,8 +952,14 @@
               `;
 
             document.getElementById("result").innerHTML = text;
-
-            await addDoc(rollsRef, { text: text, time: Date.now() });
+            if (!currentRollsRef) {
+               console.warn("La sala no está inicializada aún");
+               return;
+            }
+            await addDoc(currentRollsRef, {
+               text: timestamp + text,
+               time: Date.now(),
+            });
          };
          window.rollSingleDie = async function (sides) {
             const roll = Math.floor(Math.random() * sides) + 1;
@@ -902,17 +967,26 @@
                document.getElementById("playerName").value ||
                auth.currentUser.email;
 
+            const timestamp = new Date().toLocaleTimeString([], {
+               hour: "2-digit",
+               minute: "2-digit",
+               second: "2-digit",
+            });
+
             const resultHTML = `
-              <strong>${player}</strong><br><br>
+              ${timestamp} » <strong>${player}</strong><br><br>
               <span class="dice-icon d${sides} roll-animate">${roll}</span>
               <br><br>
               <strong>Total: ${roll}</strong>
               `;
 
             document.getElementById("result").innerHTML = resultHTML;
-
-            await addDoc(rollsRef, {
-               text: resultHTML,
+            if (!currentRollsRef) {
+               console.warn("La sala no está inicializada aún");
+               return;
+            }
+            await addDoc(currentRollsRef, {
+               text: timestamp + resultHTML,
                time: Date.now(),
             });
          };
