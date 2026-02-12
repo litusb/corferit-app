@@ -415,6 +415,24 @@
         width: 50px;
         text-align: center;
       }
+      .site-footer {
+        margin-top: 1rem;
+        padding: 1rem 1rem;
+        text-align: center;
+/*         border-top: 1px solid #ddd; */
+      }
+
+      .logo-img {
+        height: 40px;
+        width: auto;
+        opacity: 0.85;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+      }
+
+      .daggerheart-logo:hover .logo-img {
+        opacity: 1;
+        transform: scale(1.05);
+      }
     </style>
   </head>
 
@@ -487,6 +505,13 @@
         <button class="btn" onclick="logout()">Tanca sessió</button>
       </div>
     </div>
+
+      <footer class="site-footer">
+        <a href="https://daggerheart.com" target="_blank" rel="noopener" class="daggerheart-logo">
+          <img src="DHCompatible.svg" alt="Daggerheart Compatible" class="logo-img">
+        </a>
+      </footer>
+
 
     <script type="module">
       // Firebase imports
