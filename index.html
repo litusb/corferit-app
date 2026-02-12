@@ -1,836 +1,796 @@
 <!DOCTYPE html>
 <html lang="ca">
-   <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-      <title>Corferit - Tirades</title>
+    <title>Corferit - Tirades</title>
 
-      <style>
-         body {
-            font-family: sans-serif;
-            background: #444;
-            color: #eee;
-            text-align: center;
-            padding: 20px;
-         }
-         .page {
-            max-width: 350px;
-            margin: 40px auto;
-            padding: 32px 40px;
-            background: #222;
-            border-radius: 10px;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
-         }
-         .btn {
-            margin: 10px;
-            padding: 12px 22px;
-            background: #444;
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            font-size: 20px;
-            cursor: pointer;
-         }
-         #result {
-            margin-top: 20px;
-            font-size: 26px;
-         }
-         #history {
-            margin-top: 20px;
-            text-align: left;
-            width: 320px;
-            margin-left: auto;
-            margin-right: auto;
-            max-height: 300px;
-            overflow-y: auto;
-         }
-         .esperança {
-            color: #ffd700;
-            font-weight: bold;
-         }
-         .por {
-            color: #800080;
-            font-weight: bold;
-         }
-         #roomLabel {
-            opacity: 0.7;
-            margin-bottom: 10px;
-         }
-         #loginBox input {
-            padding: 8px;
-            margin: 5px;
-            width: 200px;
-         }
-         #loginBox {
-            margin-bottom: 20px;
-         }
-         .dice-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 8px 0;
-            background: #333;
-            padding: 8px 10px;
-            border-radius: 8px;
-         }
+    <style>
+      body {
+        font-family: sans-serif;
+        background: #444;
+        color: #eee;
+        text-align: center;
+        padding: 20px;
+      }
+      .page {
+        max-width: 350px;
+        margin: 40px auto;
+        padding: 32px 40px;
+        background: #222;
+        border-radius: 10px;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+      }
+      .btn {
+        margin: 10px;
+        padding: 12px 22px;
+        background: #444;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 20px;
+        cursor: pointer;
+      }
+      #rstbtn {
+        margin: 8px;
+        padding: 8px 18px;
+        background: #444;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 15px;
+        cursor: pointer;
+        width: auto;
+        height: auto;
+      }
+      #result {
+        margin-top: 20px;
+        font-size: 26px;
+      }
+      #history {
+        margin-top: 20px;
+        text-align: left;
+        width: 320px;
+        margin-left: auto;
+        margin-right: auto;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      .esperança {
+        color: #ffd700;
+        font-weight: bold;
+      }
+      .por {
+        color: #800080;
+        font-weight: bold;
+      }
+      #roomLabel {
+        opacity: 0.7;
+        margin-bottom: 10px;
+      }
+      #loginBox input {
+        padding: 8px;
+        margin: 5px;
+        width: 200px;
+      }
+      #loginBox {
+        margin-bottom: 20px;
+      }
+      .dice-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 8px 0;
+        background: #333;
+        padding: 8px 10px;
+        border-radius: 8px;
+      }
+      .dice-label {
+        font-weight: bold;
+      }
+      .counter {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .counter button {
+        background: #555;
+        border: none;
+        color: white;
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      .counter input {
+        width: 40px;
+        text-align: center;
+        background: #222;
+        border: 1px solid #555;
+        color: white;
+        border-radius: 6px;
+        padding: 4px;
+      }
+      /* ===== ICONES DE DAUS ===== */
+      .dice-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 14px;
+        margin-right: 6px;
+        color: white;
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.6);
+        transition: transform 0.2s ease;
+      }
+      /* Colors per tipus */
+      /* D3 → cercle */
+      .d3 {
+        background-color: #0661bb;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="rgba(0,0,0,0.2)" stroke="black" stroke-width="2"/></svg>');
+        background-size: 70% 70%;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
 
-         .dice-label {
-            font-weight: bold;
-         }
+      /* D4 → triangle */
+      .d4 {
+        background-color: #39b44a;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><polygon points="32,4 60,60 4,60" fill="rgba(0,0,0,0.2)" stroke="black" stroke-width="2"/></svg>');
+        background-size: 70% 70%;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
 
-         .counter {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-         }
+      /* D6 → quadrat */
+      .d6 {
+        background-color: #27bbd0;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect x="4" y="4" width="56" height="56" fill="rgba(0,0,0,0.2)" stroke="black" stroke-width="2"/></svg>');
+        background-size: 70% 70%;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
 
-         .counter button {
-            background: #555;
-            border: none;
-            color: white;
-            width: 26px;
-            height: 26px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-         }
+      /* D8 → octaedre (rombe) */
+      .d8 {
+        background-color: #9234e5;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><polygon points="32,4 60,32 32,60 4,32" fill="rgba(0,0,0,0.2)" stroke="black" stroke-width="2"/></svg>');
+        background-size: 70% 70%;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
 
-         .counter input {
-            width: 40px;
-            text-align: center;
-            background: #222;
-            border: 1px solid #555;
-            color: white;
-            border-radius: 6px;
-            padding: 4px;
-         }
-         /* ===== ICONOS DE DADOS ===== */
+      /* D10 →  */
+      .d10 {
+        background-color: #e03293;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><polygon points="32,4 56,20 56,44 32,60 8,44 8,20" fill="rgba(0,0,0,0.2)" stroke="black" stroke-width="2"/><line x1="32" y1="4" x2="32" y2="60" stroke="black" stroke-width="1"/><line x1="8" y1="20" x2="56" y2="44" stroke="black" stroke-width="1"/><line x1="56" y1="20" x2="8" y2="44" stroke="black" stroke-width="1"/></svg>');
 
-         .dice-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-            margin-right: 6px;
-            color: white;
-            box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.6);
-            transition: transform 0.2s ease;
-         }
+        background-size: 70% 70%;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
 
-         /* Colores por tipo */
-         /* D3 → círculo */
-         .d3 {
-            background-color: #0661bb;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="rgba(0,0,0,0.2)" stroke="black" stroke-width="2"/></svg>');
-            background-size: 70% 70%;
-            background-repeat: no-repeat;
-            background-position: center;
-         }
+      /* D12 → pentàgon */
+      .d12 {
+        background-color: #d83025;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><polygon points="32,4 60,24 49,60 15,60 4,24" fill="rgba(0,0,0,0.2)" stroke="black" stroke-width="2"/></svg>');
+        background-size: 70% 70%;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
 
-         /* D4 → triángulo */
-         .d4 {
-            background-color: #39b44a;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><polygon points="32,4 60,60 4,60" fill="rgba(0,0,0,0.2)" stroke="black" stroke-width="2"/></svg>');
-            background-size: 70% 70%;
-            background-repeat: no-repeat;
-            background-position: center;
-         }
+      /* D20 → estel */
+      .d20 {
+        background-color: #f05a24;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="rgba(0,0,0,0.1)" stroke="black" stroke-width="2"/><polygon points="32,4 44,20 60,24 48,36 52,56 32,44 12,56 16,36 4,24 20,20" fill="none" stroke="black" stroke-width="1"/></svg>');
 
-         /* D6 → cuadrado */
-         .d6 {
-            background-color: #27bbd0;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect x="4" y="4" width="56" height="56" fill="rgba(0,0,0,0.2)" stroke="black" stroke-width="2"/></svg>');
-            background-size: 70% 70%;
-            background-repeat: no-repeat;
-            background-position: center;
-         }
+        background-size: 70% 70%;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
 
-         /* D8 → octaedro (forma romboidal simple) */
-         .d8 {
-            background-color: #9234e5;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><polygon points="32,4 60,32 32,60 4,32" fill="rgba(0,0,0,0.2)" stroke="black" stroke-width="2"/></svg>');
-            background-size: 70% 70%;
-            background-repeat: no-repeat;
-            background-position: center;
-         }
+      /* D100 → cercle amb doble vora */
+      .d100 {
+        background-color: #22b473;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="rgba(0,0,0,0.15)" stroke="black" stroke-width="2"/><circle cx="32" cy="32" r="16" fill="none" stroke="black" stroke-width="2"/></svg>');
+        background-size: 70% 70%;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+      /* Animació de tirada */
+      @keyframes rollBounce {
+        0% {
+          transform: scale(1) rotate(0deg);
+        }
+        30% {
+          transform: scale(1.2) rotate(10deg);
+        }
+        60% {
+          transform: scale(0.9) rotate(-8deg);
+        }
+        100% {
+          transform: scale(1) rotate(0deg);
+        }
+      }
+      .roll-animate {
+        animation: rollBounce 0.4s ease;
+      }
+      /* ===== BOTONS TIPUS DAU ===== */
+      .dice-button {
+        width: 60px;
+        height: 60px;
+        border-radius: 14px;
+        border: none;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 8px;
+        color: white;
+        background: #444;
+        box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.6);
+        transition:
+          transform 0.15s ease,
+          background 0.2s ease;
+      }
+      .dice-button:hover {
+        transform: scale(1.08);
+        background: #555;
+      }
+      .btn-advantage {
+        background: #16a085;
+      }
+      .btn-disadvantage {
+        background: #e74c3c;
+      }
+      .btn-duality {
+        background: linear-gradient(
+          135deg,
+          #f1c40f,
+          #d4ac0d 45%,
+          #8e44ad 55%,
+          #6c3483
+        );
+        box-shadow:
+          inset 0 0 12px rgba(0, 0, 0, 0.6),
+          0 0 10px rgba(241, 196, 15, 0.3),
+          0 0 10px rgba(142, 68, 173, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+      .btn-duality:hover {
+        filter: brightness(1.1);
+        transform: scale(1.08);
+      }
+      .esperanca-die {
+        background: #f1c40f;
+        color: black;
+      }
+      .por-die {
+        background: #8e44ad;
+      }
+      .adv-die {
+        background: #2ecc71;
+        color: #000;
+      }
+      .dis-die {
+        background: #e74c3c;
+        color: #fff;
+      }
+      .adv-die::before {
+        content: "+";
+        font-weight: bold;
+        margin-right: 2px;
+      }
+      .dis-die::before {
+        content: "−";
+        font-weight: bold;
+        margin-right: 2px;
+      }
+      .dice-icon {
+        cursor: pointer;
+      }
+      .dice-icon:hover {
+        transform: scale(1.1);
+      }
+      .modificador-fixe {
+        background: #b3b3b3;
+        color: #fff;
+      }
+      #toggleDice {
+        color: #f1c40f;
+        user-select: none;
+        margin-bottom: 6px;
+        transition: color 0.2s;
+      }
+      #toggleDice:hover {
+        color: #f39c12;
+      }
+      #diceMenu {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* dos columnes */
+        gap: 10px;
+        padding: 12px;
+        border-radius: 12px;
+        background: #333; /* color de la pastilla */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+      @media (max-width: 500px) {
+        #diceMenu {
+          grid-auto-flow: row; /* torna a fila única */
+          grid-template-columns: 1fr;
+        }
+      }
+      .dice-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0;
+        padding: 0;
+        background: none;
+      }
+      .critical {
+        color: #f39c12;
+        font-weight: bold;
+        font-size: 18px;
+        text-align: center;
+        display: block;
+        margin-top: 8px;
+        animation: pulse 0.5s ease 0s 2;
+      }
+      /* Animació de pulse */
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.3);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      #fearContainer {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: center;
+        min-height: 32px;
+      }
+      #fearContainerWrapper {
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .fear-dot {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background-color: #999; /* fons gris clar */
+        border: 2px solid #ccc;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+      .fear-dot.filled {
+        background-color: #800080; /* morat */
+      }
+      #fearControls {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 6px;
+        justify-content: center;
+      }
+      #playerName {
+        padding: 8px;
+        margin-bottom: 10px
+      }
+      #fixedModifier {
+        display: none;
+        margin-bottom: 10px;
+        margin-top: 5px;
+      }
+      #modifierInput {
+        width: 50px;
+        text-align: center;
+      }
+    </style>
+  </head>
 
-         /* D10 →  */
-         .d10 {
-            background-color: #e03293;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><polygon points="32,4 56,20 56,44 32,60 8,44 8,20" fill="rgba(0,0,0,0.2)" stroke="black" stroke-width="2"/><line x1="32" y1="4" x2="32" y2="60" stroke="black" stroke-width="1"/><line x1="8" y1="20" x2="56" y2="44" stroke="black" stroke-width="1"/><line x1="56" y1="20" x2="8" y2="44" stroke="black" stroke-width="1"/></svg>');
+  <body>
+    <div class="page">
+      <h1>🎲 Corferit</h1>
 
-            background-size: 70% 70%;
-            background-repeat: no-repeat;
-            background-position: center;
-         }
-
-         /* D12 → pentágono */
-         .d12 {
-            background-color: #d83025;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><polygon points="32,4 60,24 49,60 15,60 4,24" fill="rgba(0,0,0,0.2)" stroke="black" stroke-width="2"/></svg>');
-            background-size: 70% 70%;
-            background-repeat: no-repeat;
-            background-position: center;
-         }
-
-         /* D20 → icosaedro simplificado (estrella) */
-         .d20 {
-            background-color: #f05a24;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="rgba(0,0,0,0.1)" stroke="black" stroke-width="2"/><polygon points="32,4 44,20 60,24 48,36 52,56 32,44 12,56 16,36 4,24 20,20" fill="none" stroke="black" stroke-width="1"/></svg>');
-
-            background-size: 70% 70%;
-            background-repeat: no-repeat;
-            background-position: center;
-         }
-
-         /* D100 → círculo con borde doble */
-         .d100 {
-            background-color: #22b473;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="rgba(0,0,0,0.15)" stroke="black" stroke-width="2"/><circle cx="32" cy="32" r="16" fill="none" stroke="black" stroke-width="2"/></svg>');
-            background-size: 70% 70%;
-            background-repeat: no-repeat;
-            background-position: center;
-         }
-
-         /* Animación de tirada */
-         @keyframes rollBounce {
-            0% {
-               transform: scale(1) rotate(0deg);
-            }
-            30% {
-               transform: scale(1.2) rotate(10deg);
-            }
-            60% {
-               transform: scale(0.9) rotate(-8deg);
-            }
-            100% {
-               transform: scale(1) rotate(0deg);
-            }
-         }
-
-         .roll-animate {
-            animation: rollBounce 0.4s ease;
-         }
-         /* ===== BOTONES TIPO DADO ===== */
-
-         .dice-button {
-            width: 60px;
-            height: 60px;
-            border-radius: 14px;
-            border: none;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin: 8px;
-            color: white;
-            background: #444;
-            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.6);
-            transition:
-               transform 0.15s ease,
-               background 0.2s ease;
-         }
-
-         .dice-button:hover {
-            transform: scale(1.08);
-            background: #555;
-         }
-
-         /* Colores especiales */
-         .btn-advantage {
-            background: #16a085;
-         }
-
-         .btn-disadvantage {
-            background: #e74c3c;
-         }
-
-         .btn-duality {
-            background: linear-gradient(
-               135deg,
-               #f1c40f,
-               #d4ac0d 45%,
-               #8e44ad 55%,
-               #6c3483
-            );
-            box-shadow:
-               inset 0 0 12px rgba(0, 0, 0, 0.6),
-               0 0 10px rgba(241, 196, 15, 0.3),
-               0 0 10px rgba(142, 68, 173, 0.3);
-            position: relative;
-            overflow: hidden;
-         }
-         .btn-duality:hover {
-            filter: brightness(1.1);
-            transform: scale(1.08);
-         }
-
-         .esperanca-die {
-            background: #f1c40f;
-            color: black;
-         }
-
-         .por-die {
-            background: #8e44ad;
-         }
-         /* d6 ventaja y desventaja */
-
-         .adv-die {
-            background: #2ecc71;
-            color: #000;
-         }
-
-         .dis-die {
-            background: #e74c3c;
-            color: #fff;
-         }
-         .adv-die::before {
-            content: "+";
-            font-weight: bold;
-            margin-right: 2px;
-         }
-
-         .dis-die::before {
-            content: "−";
-            font-weight: bold;
-            margin-right: 2px;
-         }
-         .dice-icon {
-            cursor: pointer;
-         }
-
-         .dice-icon:hover {
-            transform: scale(1.1);
-         }
-
-         .modificador-fixe {
-            background: #b3b3b3;
-            color: #fff;
-         }
-
-         #toggleDice {
-            color: #f1c40f;
-            user-select: none;
-            margin-bottom: 6px;
-            transition: color 0.2s;
-         }
-
-         #toggleDice:hover {
-            color: #f39c12;
-         }
-         /* contenedor tipo pastilla */
-         #diceMenu {
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* dos columnas */
-            gap: 10px;
-            padding: 12px;
-            border-radius: 12px;
-            background: #333; /* color de la pastilla */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-         }
-
-         @media (max-width: 500px) {
-            #diceMenu {
-               grid-auto-flow: row; /* vuelve a fila única */
-               grid-template-columns: 1fr;
-            }
-         }
-
-         /* cada fila de dado sin fondo propio */
-         .dice-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 0; /* quitamos margen extra */
-            padding: 0; /* quitamos padding extra */
-            background: none; /* quitamos color de fondo */
-         }
-         /* CRÍTICO */
-         .critical {
-            color: #f39c12; /* dorado brillante */
-            font-weight: bold;
-            font-size: 18px;
-            text-align: center;
-            display: block;
-            margin-top: 8px;
-            animation: pulse 0.5s ease 0s 2; /* pulso animado */
-         }
-
-         /* Animación de pulso */
-         @keyframes pulse {
-            0% {
-               transform: scale(1);
-            }
-            50% {
-               transform: scale(1.3);
-            }
-            100% {
-               transform: scale(1);
-            }
-         }
-         #fearContainer {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            justify-content: center;
-            min-height: 32px;
-         }
-
-         .fear-dot {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background-color: #999; /* fondo gris claro */
-            border: 2px solid #ccc;
-            cursor: pointer;
-            transition: background 0.3s;
-         }
-
-         .fear-dot.filled {
-            background-color: #800080; /* morado */
-         }
-
-         #fearControls {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 6px;
-            justify-content: center;
-         }
-      </style>
-   </head>
-
-   <body>
-      <div class="page">
-         <h1>🎲 Corferit</h1>
-
-         <div id="loginBox">
-            <input
-               type="email"
-               id="email"
-               placeholder="Correu electrònic"
-            /><br />
-            <input
-               type="password"
-               id="password"
-               placeholder="Paraula de pas"
-            /><br />
-            <button class="btn" onclick="login()">Entrar</button>
-         </div>
-
-         <div id="app" style="display: none">
-            <div id="roomLabel"></div>
-            <div
-               id="fearContainerWrapper"
-               style="
-                  margin-bottom: 20px;
-                  display: flex;
-                  flex-direction: column;
-                  align-items: center;
-               "
-            >
-               <div id="fearControls" style="margin-bottom: 6px; display: none">
-                  <button id="fearMinus">-</button>
-                  <button id="fearPlus">+</button>
-               </div>
-               <div
-                  id="fearContainer"
-                  style="display: flex; gap: 6px; flex-wrap: wrap"
-               ></div>
-            </div>
-
-            <input
-               id="playerName"
-               placeholder="Un nom"
-               style="padding: 8px; margin-bottom: 10px"
-            /><br />
-
-            <button
-               class="dice-button btn-disadvantage"
-               onclick="rollDuality(0)"
-            >
-               ⬇️D-
-            </button>
-
-            <button class="dice-button btn-duality" onclick="rollDuality()">
-               ⬡⬢
-            </button>
-
-            <button class="dice-button btn-advantage" onclick="rollDuality(1)">
-               ⬆️A+
-            </button>
-
-            <h3 id="toggleDice" style="cursor: pointer">► Daus clàssics</h3>
-
-            <div id="diceContainer" style="display: none">
-               <div id="diceMenu"></div>
-
-               <div
-                  id="fixedModifier"
-                  style="display: none; margin-bottom: 10px; margin-top: 5px"
-                  class="counter"
-               >
-                  <span>Mod. </span>
-                  <button onclick="changeFixedModifier(-1)">-</button>
-                  <input
-                     type="number"
-                     id="modifierInput"
-                     value="0"
-                     style="width: 50px; text-align: center"
-                  />
-                  <button onclick="changeFixedModifier(1)">+</button>
-               </div>
-
-               <button class="btn" onclick="rollCustomDice()">Tirar daus</button
-               ><br /><button class="btn" onclick="clearDice()">Neteja</button>
-            </div>
-
-            <div id="result"></div>
-
-            <h3>Historial</h3>
-            <div id="history"></div>
-
-            <br />
-            <button class="btn" onclick="logout()">Tanca sessió</button>
-         </div>
+      <div id="loginBox">
+        <input type="email" id="email" placeholder="Identificador" /><br />
+        <input
+          type="password"
+          id="password"
+          placeholder="Paraula de pas"
+        /><br />
+        <button class="btn" onclick="login()">Entrar</button>
       </div>
 
-      <script type="module">
-         // 🔹 Firebase imports
-         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-         import {
-            getFirestore,
-            collection,
-            addDoc,
-            onSnapshot,
-            query,
-            orderBy,
-            limit,
-            doc,
-            getDoc,
-            getDocs,
-            deleteDoc,
-            setDoc,
-            serverTimestamp,
-         } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-         import {
-            getAuth,
-            signInWithEmailAndPassword,
-            onAuthStateChanged,
-            signOut,
-         } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+      <div id="app" style="display: none">
+        <div id="roomLabel"></div>
+        <div id="fearContainerWrapper">
+          <div id="fearControls" style="display: none">
+            <button id="fearMinus">-</button>
+            <button id="fearPlus">+</button>
+          </div>
+          <div id="fearContainer"></div>
+        </div>
 
-         // 🔹 Firebase config
-         const firebaseConfig = {
-            apiKey: "AIzaSyCLRBsJDKcv9I0hf3uosB0F3w7rXWU-40A",
-            authDomain: "corferit-daus.firebaseapp.com",
-            projectId: "corferit-daus",
-            storageBucket: "corferit-daus.firebasestorage.app",
-            messagingSenderId: "756634249064",
-            appId: "1:756634249064:web:8e09d8bf75aebcb1b118dd",
-         };
+        <input id="playerName" placeholder="Un nom"/>
+        <br />
 
-         const app = initializeApp(firebaseConfig);
-         const db = getFirestore(app);
-         const auth = getAuth(app);
+        <button class="dice-button btn-disadvantage" onclick="rollDuality(0)">
+          ⬇️D-
+        </button>
 
-         let currentRoomName = null;
-         let currentRollsRef = null;
+        <button class="dice-button btn-duality" onclick="rollDuality()">
+          ⬡⬢
+        </button>
 
-         async function cleanOldRooms() {
-            const roomsSnapshot = await getDocs(collection(db, "rooms")); // 🔹 getDocs para colecciones
-            const now = Date.now();
-            const DAY = 24 * 60 * 60 * 1000;
+        <button class="dice-button btn-advantage" onclick="rollDuality(1)">
+          ⬆️A+
+        </button>
 
-            roomsSnapshot.forEach(async (roomDoc) => {
-               const data = roomDoc.data();
-               if (data.createdAt && now - data.createdAt.toMillis() > DAY) {
-                  // borrar tiradas
-                  const rollsSnapshot = await getDocs(
-                     collection(db, `rooms/${roomDoc.id}/rolls`),
-                  ); // 🔹 getDocs también
-                  rollsSnapshot.forEach(async (rollDoc) => {
-                     await deleteDoc(rollDoc.ref);
-                  });
+        <h3 id="toggleDice" style="cursor: pointer">► Daus clàssics</h3>
 
-                  // borrar sala
-                  await deleteDoc(roomDoc.ref);
-               }
+        <div id="diceContainer" style="display: none">
+          <div id="diceMenu"></div>
+
+          <div id="fixedModifier" class="counter">
+            <button id="rstbtn" onclick="clearDice()">Neteja</button>
+            &nbsp;&nbsp;&nbsp;
+            <span>Mod. </span>
+            <button onclick="changeFixedModifier(-1)">-</button>
+            <input type="number" id="modifierInput" value="0"/>
+            <button onclick="changeFixedModifier(1)">+</button>
+          </div>
+
+          <button class="btn" onclick="rollCustomDice()">Tirar daus</button>
+        </div>
+
+        <div id="result"></div>
+
+        <h3>Historial</h3>
+        <div id="history"></div>
+
+        <br />
+        <button class="btn" onclick="logout()">Tanca sessió</button>
+      </div>
+    </div>
+
+    <script type="module">
+      // Firebase imports
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        onSnapshot,
+        query,
+        orderBy,
+        limit,
+        doc,
+        getDoc,
+        getDocs,
+        deleteDoc,
+        setDoc,
+        serverTimestamp,
+      } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+      import {
+        getAuth,
+        signInWithEmailAndPassword,
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+      // Firebase config
+      const firebaseConfig = {
+        apiKey: "AIzaSyCLRBsJDKcv9I0hf3uosB0F3w7rXWU-40A",
+        authDomain: "corferit-daus.firebaseapp.com",
+        projectId: "corferit-daus",
+        storageBucket: "corferit-daus.firebasestorage.app",
+        messagingSenderId: "756634249064",
+        appId: "1:756634249064:web:8e09d8bf75aebcb1b118dd",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const auth = getAuth(app);
+
+      let currentRoomName = null;
+      let currentRollsRef = null;
+
+      async function cleanOldRooms() {
+        const roomsSnapshot = await getDocs(collection(db, "rooms")); // getDocs para colecciones
+        const now = Date.now();
+        const DAY = 24 * 60 * 60 * 1000;
+
+        roomsSnapshot.forEach(async (roomDoc) => {
+          const data = roomDoc.data();
+          if (data.createdAt && now - data.createdAt.toMillis() > DAY) {
+            // borrar tiradas
+            const rollsSnapshot = await getDocs(
+              collection(db, `rooms/${roomDoc.id}/rolls`),
+            ); // 🔹 getDocs también
+            rollsSnapshot.forEach(async (rollDoc) => {
+              await deleteDoc(rollDoc.ref);
             });
-         }
 
-         cleanOldRooms();
+            // borrar sala
+            await deleteDoc(roomDoc.ref);
+          }
+        });
+      }
 
-         // 🔹 Sala desde URL
-         function getRoomFromURL() {
-            const params = new URLSearchParams(window.location.search);
-            return params.get("room") || "sala-general";
-         }
+      cleanOldRooms();
 
-         // const roomName = getRoomFromURL();
-         // document.getElementById("roomLabel").innerText = "Sala: " + roomName;
-         //
-         // const rollsRef = collection(db, "rooms", roomName, "rolls");
-         //
-         // const q = query(rollsRef, orderBy("time", "desc"), limit(50));
+      // Sala desde URL
+      function getRoomFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get("room") || "sala-general";
+      }
 
-         // 🔐 LOGIN
-         window.login = async function () {
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
+      // LOGIN
+      window.login = async function () {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
 
-            try {
-               await signInWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-               alert("Error de login: " + error.message);
-            }
-         };
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+        } catch (error) {
+          alert("Error de login: " + error.message);
+        }
+      };
 
-         // 🔐 LOGOUT
-         window.logout = async function () {
-            await signOut(auth);
-         };
-         async function checkMaster(user) {
-            const userRef = doc(db, "users", user.uid);
-            const userSnap = await getDoc(userRef);
+      // LOGOUT
+      window.logout = async function () {
+        await signOut(auth);
+      };
+      async function checkMaster(user) {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
 
-            if (userSnap.exists()) {
-               const data = userSnap.data();
-               return data.isMaster === true; // true si es máster
-            }
-            return false; // no existe → no es máster
-         }
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          return data.isMaster === true; // true si es máster
+        }
+        return false; // no existe → no es máster
+      }
 
-         // 🔐 Estado de autenticación
-         onAuthStateChanged(auth, async (user) => {
-            if (!user) {
-               document.getElementById("loginBox").style.display = "block";
-               document.getElementById("app").style.display = "none";
-               return;
-            }
+      // Estado de autenticación
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          document.getElementById("loginBox").style.display = "block";
+          document.getElementById("app").style.display = "none";
+          return;
+        }
 
-            document.getElementById("loginBox").style.display = "none";
-            document.getElementById("app").style.display = "block";
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("app").style.display = "block";
 
-            const roomName = getRoomFromURL();
-            document.getElementById("roomLabel").innerText =
-               "Sala: " + roomName;
+        const roomName = getRoomFromURL();
+        document.getElementById("roomLabel").innerText = "Sala: " + roomName;
 
-            const roomRef = doc(db, "rooms", roomName);
-            const roomSnap = await getDoc(roomRef);
+        const roomRef = doc(db, "rooms", roomName);
+        const roomSnap = await getDoc(roomRef);
 
-            if (!roomSnap.exists()) {
-               try {
-                  await setDoc(roomRef, {
-                     name: roomName,
-                     createdAt: serverTimestamp(),
-                  });
-               } catch (e) {
-                  console.warn("No tienes permisos para crear esta sala");
-                  return;
-               }
-            }
-
-            // 🔥 SOLO AHORA creamos las referencias
-            const rollsRef = collection(db, "rooms", roomName, "rolls");
-            const q = query(rollsRef, orderBy("time", "desc"), limit(50));
-
-            currentRoomName = roomName;
-            currentRollsRef = collection(db, "rooms", roomName, "rolls");
-
-            const isMaster = await checkMaster(user);
-
-            startApp({
-               isMaster,
-               roomName,
-               rollsRef,
-               q,
+        if (!roomSnap.exists()) {
+          try {
+            await setDoc(roomRef, {
+              name: roomName,
+              createdAt: serverTimestamp(),
             });
-         });
+          } catch (e) {
+            console.warn("No tienes permisos para crear esta sala");
+            return;
+          }
+        }
 
-         // 🔹 Firestore en tiempo real
-         function startApp({ isMaster, roomName, rollsRef, q }) {
-            onSnapshot(q, (snapshot) => {
-               const historyDiv = document.getElementById("history");
-               historyDiv.innerHTML = "";
-               snapshot.forEach((doc) => {
-                  const data = doc.data();
-                  historyDiv.innerHTML += `<div>${data.text}</div><hr>`;
-               });
-            });
-            createDiceMenu();
+        // creamos las referencias
+        const rollsRef = collection(db, "rooms", roomName, "rolls");
+        const q = query(rollsRef, orderBy("time", "desc"), limit(50));
 
-            // ==== CONTADOR DE POR ====
-            let currentFear = 0;
-            let maxFear = 12;
-            // let isMaster = true; // true para mostrar controles
+        currentRoomName = roomName;
+        currentRollsRef = collection(db, "rooms", roomName, "rolls");
 
-            const fearContainer = document.getElementById("fearContainer");
-            const fearControls = document.getElementById("fearControls");
-            const fearPlus = document.getElementById("fearPlus");
-            const fearMinus = document.getElementById("fearMinus");
+        const isMaster = await checkMaster(user);
 
-            // Renderiza los dots según currentFear y maxFear
-            function renderFearDots() {
-               fearContainer.innerHTML = "";
-               for (let i = 0; i < maxFear; i++) {
-                  const dot = document.createElement("div");
-                  dot.className = "fear-dot";
-                  if (i < currentFear) dot.classList.add("filled");
+        startApp({
+          isMaster,
+          roomName,
+          rollsRef,
+          q,
+        });
+      });
 
-                  if (isMaster) {
-                     // clic izquierdo = aumentar hasta ese punto
-                     dot.addEventListener("click", () => {
-                        currentFear = i + 1;
-                        updateFearDisplay();
-                        saveFear();
-                     });
-                     // clic derecho = disminuir hasta ese punto
-                     dot.addEventListener("contextmenu", (e) => {
-                        e.preventDefault();
-                        currentFear = i;
-                        updateFearDisplay();
-                        saveFear();
-                     });
-                  }
+      // Firestore en tiempo real
+      function startApp({ isMaster, roomName, rollsRef, q }) {
+        onSnapshot(q, (snapshot) => {
+          const historyDiv = document.getElementById("history");
+          historyDiv.innerHTML = "";
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            historyDiv.innerHTML += `<div>${data.text}</div><hr>`;
+          });
+        });
+        createDiceMenu();
 
-                  fearContainer.appendChild(dot);
-               }
+        // ==== CONTADOR DE POR ====
+        let currentFear = 0;
+        let maxFear = 12;
+        // let isMaster = true; // true para mostrar controles
+
+        const fearContainer = document.getElementById("fearContainer");
+        const fearControls = document.getElementById("fearControls");
+        const fearPlus = document.getElementById("fearPlus");
+        const fearMinus = document.getElementById("fearMinus");
+
+        // Renderiza los dots según currentFear y maxFear
+        function renderFearDots() {
+          fearContainer.innerHTML = "";
+          for (let i = 0; i < maxFear; i++) {
+            const dot = document.createElement("div");
+            dot.className = "fear-dot";
+            if (i < currentFear) dot.classList.add("filled");
+
+            if (isMaster) {
+              // clic izquierdo = aumentar hasta ese punto
+              dot.addEventListener("click", () => {
+                currentFear = i + 1;
+                updateFearDisplay();
+                saveFear();
+              });
+              // clic derecho = disminuir hasta ese punto
+              dot.addEventListener("contextmenu", (e) => {
+                e.preventDefault();
+                currentFear = i;
+                updateFearDisplay();
+                saveFear();
+              });
             }
 
-            // Actualiza el display sin tocar Firestore
-            function updateFearDisplay() {
-               const dots = document.querySelectorAll(".fear-dot");
-               dots.forEach((dot, index) => {
-                  dot.classList.toggle("filled", index < currentFear);
-               });
-            }
+            fearContainer.appendChild(dot);
+          }
+        }
 
-            // Guardar en Firestore
-            async function saveFear() {
-               try {
-                  const fearRef = doc(db, "rooms", roomName, "fear", "counter");
+        // Actualiza el display sin tocar Firestore
+        function updateFearDisplay() {
+          const dots = document.querySelectorAll(".fear-dot");
+          dots.forEach((dot, index) => {
+            dot.classList.toggle("filled", index < currentFear);
+          });
+        }
 
-                  await setDoc(fearRef, { value: currentFear, max: maxFear });
-               } catch (err) {
-                  console.error("Error guardando Fear en Firestore:", err);
-               }
-            }
-
-            // Sincronización en tiempo real con Firestore
+        // Guardar en Firestore
+        async function saveFear() {
+          try {
             const fearRef = doc(db, "rooms", roomName, "fear", "counter");
 
-            onSnapshot(fearRef, (docSnap) => {
-               if (docSnap.exists()) {
-                  const data = docSnap.data();
-                  currentFear = data.value ?? 0;
-                  maxFear = data.max ?? 12;
-               }
-               renderFearDots();
-            });
+            await setDoc(fearRef, { value: currentFear, max: maxFear });
+          } catch (err) {
+            console.error("Error guardando Fear en Firestore:", err);
+          }
+        }
 
-            // Botones de añadir/quitar casillas
-            fearPlus.addEventListener("click", () => {
-               maxFear++;
-               renderFearDots();
-               saveFear();
-            });
-            fearMinus.addEventListener("click", () => {
-               if (maxFear > 12) maxFear--;
-               if (currentFear > maxFear) currentFear = maxFear;
-               renderFearDots();
-               saveFear();
-            });
+        // Sincronización en tiempo real con Firestore
+        const fearRef = doc(db, "rooms", roomName, "fear", "counter");
 
-            // Mostrar controles solo si es master
-            fearControls.style.display = isMaster ? "flex" : "none";
+        onSnapshot(fearRef, (docSnap) => {
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            currentFear = data.value ?? 0;
+            maxFear = data.max ?? 12;
+          }
+          renderFearDots();
+        });
 
-            // Render inicial para que se vean los dots aunque Firestore esté vacío
-            renderFearDots();
-         }
+        // Botones de añadir/quitar casillas
+        fearPlus.addEventListener("click", () => {
+          maxFear++;
+          renderFearDots();
+          saveFear();
+        });
+        fearMinus.addEventListener("click", () => {
+          if (maxFear > 12) maxFear--;
+          if (currentFear > maxFear) currentFear = maxFear;
+          renderFearDots();
+          saveFear();
+        });
 
-         // 🎲 Dados
-         window.rollD12 = function () {
-            return Math.floor(Math.random() * 12) + 1;
-         };
-         window.rollD6 = function () {
-            return Math.floor(Math.random() * 6) + 1;
-         };
+        // Mostrar controles solo si es master
+        fearControls.style.display = isMaster ? "flex" : "none";
 
-         let fixedModifier = 0;
+        // Render inicial para que se vean los dots aunque Firestore esté vacío
+        renderFearDots();
+      }
 
-         window.changeFixedModifier = function (amount) {
-            fixedModifier += amount;
-            document.getElementById("modifierInput").value = fixedModifier;
-         };
-         document
-            .getElementById("modifierInput")
-            .addEventListener("input", (e) => {
-               fixedModifier = parseInt(e.target.value) || 0;
-            });
-         let fixedModifierHTML = "";
+      // 🎲 Dados
+      window.rollD12 = function () {
+        return Math.floor(Math.random() * 12) + 1;
+      };
+      window.rollD6 = function () {
+        return Math.floor(Math.random() * 6) + 1;
+      };
 
-         window.rollDuality = async function (v) {
-            const esperança = rollD12();
-            const por = rollD12();
-            const d6 = rollD6();
+      let fixedModifier = 0;
 
-            let winner = "";
-            let final = esperança + por;
-            let colorClass = "";
-            let isCritical = false;
+      window.changeFixedModifier = function (amount) {
+        fixedModifier += amount;
+        document.getElementById("modifierInput").value = fixedModifier;
+      };
+      document
+        .getElementById("modifierInput")
+        .addEventListener("input", (e) => {
+          fixedModifier = parseInt(e.target.value) || 0;
+        });
+      let fixedModifierHTML = "";
 
-            if (esperança === por) {
-               isCritical = true;
-            }
+      window.rollDuality = async function (v) {
+        const esperança = rollD12();
+        const por = rollD12();
+        const d6 = rollD6();
 
-            if (esperança >= por) {
-               winner = "Esperança";
-               colorClass = "esperança";
-            } else {
-               winner = "Por";
-               colorClass = "por";
-            }
+        let winner = "";
+        let final = esperança + por;
+        let colorClass = "";
+        let isCritical = false;
 
-            // Av/Des diferenciat
-            let modifierHTML = "";
+        if (esperança === por) {
+          isCritical = true;
+        }
 
-            if (v === 1) {
-               final += d6;
-               modifierHTML = `<span class="dice-icon adv-die roll-animate">${d6}</span>`;
-            } else if (v === 0) {
-               final -= d6;
-               modifierHTML = `<span class="dice-icon dis-die roll-animate">${d6}</span>`;
-            }
+        if (esperança >= por) {
+          winner = "Esperança";
+          colorClass = "esperança";
+        } else {
+          winner = "Por";
+          colorClass = "por";
+        }
 
-            const player =
-               document.getElementById("playerName").value ||
-               auth.currentUser.email;
+        // Av/Des diferenciat
+        let modifierHTML = "";
 
-            const timestamp = new Date().toLocaleTimeString([], {
-               hour: "2-digit",
-               minute: "2-digit",
-               second: "2-digit",
-            });
+        if (v === 1) {
+          final += d6;
+          modifierHTML = `<span class="dice-icon adv-die roll-animate">${d6}</span>`;
+        } else if (v === 0) {
+          final -= d6;
+          modifierHTML = `<span class="dice-icon dis-die roll-animate">${d6}</span>`;
+        }
 
-            let criticalHTML = "";
-            if (isCritical) {
-               criticalHTML = `<span class="critical">🎯 CRÍTIC! 🎯</span>`;
-            }
+        const player =
+          document.getElementById("playerName").value || auth.currentUser.email;
 
-            let finalWithModifier = final + fixedModifier;
+        const timestamp = new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        });
 
-            if (fixedModifier != 0) {
-               fixedModifierHTML = `<span class="dice-icon modificador-fixe roll-animate">${fixedModifier >= 0 ? "+" : ""}${fixedModifier}</span>`;
-            }
-            // Versió animada amb Av/Des diferenciat
-            const text = `
+        let criticalHTML = "";
+        if (isCritical) {
+          criticalHTML = `<span class="critical">🎯 CRÍTIC! 🎯</span>`;
+        }
+
+        let finalWithModifier = final + fixedModifier;
+
+        if (fixedModifier != 0) {
+          fixedModifierHTML = `<span class="dice-icon modificador-fixe roll-animate">${fixedModifier >= 0 ? "+" : ""}${fixedModifier}</span>`;
+        }
+        // Versió animada amb Av/Des diferenciat
+        const text = `
               <strong>${player}</strong><br><br>
 
               <span class="dice-icon esperanca-die roll-animate">${esperança}</span>
@@ -844,30 +804,30 @@
               ${criticalHTML}
             `;
 
-            document.getElementById("result").innerHTML = text;
+        document.getElementById("result").innerHTML = text;
 
-            if (!currentRollsRef) {
-               console.warn("La sala no está inicializada aún");
-               return;
-            }
+        if (!currentRollsRef) {
+          console.warn("La sala no está inicializada aún");
+          return;
+        }
 
-            await addDoc(currentRollsRef, {
-               text: timestamp + text,
-               time: Date.now(),
-            });
-         };
-         const diceTypes = [3, 4, 6, 8, 10, 12, 20, 100];
+        await addDoc(currentRollsRef, {
+          text: timestamp + text,
+          time: Date.now(),
+        });
+      };
+      const diceTypes = [3, 4, 6, 8, 10, 12, 20, 100];
 
-         function createDiceMenu() {
-            const container = document.getElementById("diceMenu");
-            container.innerHTML = "";
+      function createDiceMenu() {
+        const container = document.getElementById("diceMenu");
+        container.innerHTML = "";
 
-            diceTypes.forEach((sides) => {
-               const row = document.createElement("div");
-               row.className = "dice-row";
+        diceTypes.forEach((sides) => {
+          const row = document.createElement("div");
+          row.className = "dice-row";
 
-               // Modo iconos pulsables
-               row.innerHTML = `
+          // Modo iconos pulsables
+          row.innerHTML = `
                   <div class="dice-icon d${sides}" onclick="rollSingleDie(${sides})">
                     d${sides}
                   </div>
@@ -878,72 +838,71 @@
                   </div>
                 `;
 
-               container.appendChild(row);
-            });
-         }
+          container.appendChild(row);
+        });
+      }
 
-         window.clearDice = async function () {
-            // Resetear selección de dados
-            diceTypes.forEach((sides) => {
-               document.getElementById(`dice-${sides}`).value = 0;
-            });
+      window.clearDice = async function () {
+        // Resetear selección de dados
+        diceTypes.forEach((sides) => {
+          document.getElementById(`dice-${sides}`).value = 0;
+        });
 
-            // Resetear modificador fijo
-            fixedModifier = 0;
-            const modifierInput = document.getElementById("modifierInput");
-            if (modifierInput) modifierInput.value = 0;
-            fixedModifierHTML = "";
-         };
+        // Resetear modificador fijo
+        fixedModifier = 0;
+        const modifierInput = document.getElementById("modifierInput");
+        if (modifierInput) modifierInput.value = 0;
+        fixedModifierHTML = "";
+      };
 
-         window.changeDice = function (sides, delta) {
-            const input = document.getElementById(`dice-${sides}`);
-            let value = parseInt(input.value) || 0;
-            value += delta;
-            if (value < 0) value = 0;
-            input.value = value;
-         };
+      window.changeDice = function (sides, delta) {
+        const input = document.getElementById(`dice-${sides}`);
+        let value = parseInt(input.value) || 0;
+        value += delta;
+        if (value < 0) value = 0;
+        input.value = value;
+      };
 
-         // Dados animados
-         window.rollCustomDice = async function () {
-            let resultsHTML = "";
-            let total = 0;
-            let rolledSomething = false;
+      // Dados animados
+      window.rollCustomDice = async function () {
+        let resultsHTML = "";
+        let total = 0;
+        let rolledSomething = false;
 
-            diceTypes.forEach((sides) => {
-               const qty =
-                  parseInt(document.getElementById(`dice-${sides}`).value) || 0;
+        diceTypes.forEach((sides) => {
+          const qty =
+            parseInt(document.getElementById(`dice-${sides}`).value) || 0;
 
-               for (let i = 0; i < qty; i++) {
-                  const roll = Math.floor(Math.random() * sides) + 1;
-                  total += roll;
-                  rolledSomething = true;
+          for (let i = 0; i < qty; i++) {
+            const roll = Math.floor(Math.random() * sides) + 1;
+            total += roll;
+            rolledSomething = true;
 
-                  resultsHTML += `<span class="dice-icon d${sides} roll-animate">${roll}</span>`;
-               }
-            });
+            resultsHTML += `<span class="dice-icon d${sides} roll-animate">${roll}</span>`;
+          }
+        });
 
-            if (!rolledSomething) {
-               alert("No has seleccionado ningún dado.");
-               return;
-            }
+        if (!rolledSomething) {
+          alert("No has seleccionado ningún dado.");
+          return;
+        }
 
-            let totalWithModifier = total + fixedModifier;
+        let totalWithModifier = total + fixedModifier;
 
-            const player =
-               document.getElementById("playerName").value ||
-               auth.currentUser.email;
+        const player =
+          document.getElementById("playerName").value || auth.currentUser.email;
 
-            const timestamp = new Date().toLocaleTimeString([], {
-               hour: "2-digit",
-               minute: "2-digit",
-               second: "2-digit",
-            });
+        const timestamp = new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        });
 
-            if (fixedModifier != 0) {
-               fixedModifierHTML = `<span class="dice-icon modificador-fixe roll-animate">${fixedModifier >= 0 ? "+" : ""}${fixedModifier}</span>`;
-            }
-            const text = `
-              ${timestamp} » <strong>${player}</strong><br>
+        if (fixedModifier != 0) {
+          fixedModifierHTML = `<span class="dice-icon modificador-fixe roll-animate">${fixedModifier >= 0 ? "+" : ""}${fixedModifier}</span>`;
+        }
+        const text = `
+              <strong>${player}</strong><br>
               ${resultsHTML}
               ${fixedModifierHTML}
 
@@ -951,60 +910,59 @@
               <strong>Total: ${totalWithModifier}</strong>
               `;
 
-            document.getElementById("result").innerHTML = text;
-            if (!currentRollsRef) {
-               console.warn("La sala no está inicializada aún");
-               return;
-            }
-            await addDoc(currentRollsRef, {
-               text: timestamp + text,
-               time: Date.now(),
-            });
-         };
-         window.rollSingleDie = async function (sides) {
-            const roll = Math.floor(Math.random() * sides) + 1;
-            const player =
-               document.getElementById("playerName").value ||
-               auth.currentUser.email;
+        document.getElementById("result").innerHTML = text;
+        if (!currentRollsRef) {
+          console.warn("La sala no está inicializada aún");
+          return;
+        }
+        await addDoc(currentRollsRef, {
+          text: timestamp + text,
+          time: Date.now(),
+        });
+      };
+      window.rollSingleDie = async function (sides) {
+        const roll = Math.floor(Math.random() * sides) + 1;
+        const player =
+          document.getElementById("playerName").value || auth.currentUser.email;
 
-            const timestamp = new Date().toLocaleTimeString([], {
-               hour: "2-digit",
-               minute: "2-digit",
-               second: "2-digit",
-            });
+        const timestamp = new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        });
 
-            const resultHTML = `
-              ${timestamp} » <strong>${player}</strong><br><br>
+        const resultHTML = `
+              <strong>${player}</strong><br><br>
               <span class="dice-icon d${sides} roll-animate">${roll}</span>
               <br><br>
               <strong>Total: ${roll}</strong>
               `;
 
-            document.getElementById("result").innerHTML = resultHTML;
-            if (!currentRollsRef) {
-               console.warn("La sala no está inicializada aún");
-               return;
-            }
-            await addDoc(currentRollsRef, {
-               text: timestamp + resultHTML,
-               time: Date.now(),
-            });
-         };
-         const toggleDice = document.getElementById("toggleDice");
-         toggleDice.addEventListener("click", () => {
-            const container = document.getElementById("diceContainer");
-            const modifierDiv = document.getElementById("fixedModifier");
+        document.getElementById("result").innerHTML = resultHTML;
+        if (!currentRollsRef) {
+          console.warn("La sala no está inicializada aún");
+          return;
+        }
+        await addDoc(currentRollsRef, {
+          text: timestamp + resultHTML,
+          time: Date.now(),
+        });
+      };
+      const toggleDice = document.getElementById("toggleDice");
+      toggleDice.addEventListener("click", () => {
+        const container = document.getElementById("diceContainer");
+        const modifierDiv = document.getElementById("fixedModifier");
 
-            if (container.style.display === "none") {
-               container.style.display = "block";
-               modifierDiv.style.display = "block";
-               toggleDice.innerText = "▼ Daus clàssics";
-            } else {
-               container.style.display = "none";
-               modifierDiv.style.display = "none";
-               toggleDice.innerText = "► Daus clàssics";
-            }
-         });
-      </script>
-   </body>
+        if (container.style.display === "none") {
+          container.style.display = "block";
+          modifierDiv.style.display = "block";
+          toggleDice.innerText = "▼ Daus clàssics";
+        } else {
+          container.style.display = "none";
+          modifierDiv.style.display = "none";
+          toggleDice.innerText = "► Daus clàssics";
+        }
+      });
+    </script>
+  </body>
 </html>
