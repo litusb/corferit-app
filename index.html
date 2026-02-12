@@ -539,7 +539,7 @@
       // Sala desde URL
       function getRoomFromURL() {
         const params = new URLSearchParams(window.location.search);
-        return params.get("room") || "sala-general";
+        return params.get("room") || return params.get("sala") || "sala-general";
       }
 
       // LOGIN
@@ -581,7 +581,9 @@
         document.getElementById("app").style.display = "block";
 
         const roomName = getRoomFromURL();
-        document.getElementById("roomLabel").innerText = "Sala: " + roomName;
+        if (roomName != "sala-general") {
+          document.getElementById("roomLabel").innerText = "Sala: " + roomName;
+        }
 
         const roomRef = doc(db, "rooms", roomName);
         const roomSnap = await getDoc(roomRef);
